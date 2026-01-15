@@ -42,18 +42,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // get role from Firestore: users/{uid}
-      const userRef = doc(collection(db, "users"), fbUser.uid);
-      const snap = await getDoc(userRef);
+      try {
+        // get role from Firestore: users/{uid}
+        const userRef = doc(collection(db, "users"), fbUser.uid);
+        const snap = await getDoc(userRef);
 
-      const role = (snap.exists() ? snap.data().role : "judge") as Role;
+        const role = (snap.exists() ? snap.data().role : "judge") as Role;
 
-      setUser({
-        uid: fbUser.uid,
-        displayName: fbUser.displayName,
-        role,
-      });
-      setLoading(false);
+        setUser({
+          uid: fbUser.uid,
+          displayName: fbUser.displayName,
+          role,
+        });
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        // Default to judge role if there's an error
+        setUser({
+          uid: fbUser.uid,
+          displayName: fbUser.displayName,
+          role: "judge",
+        });
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsub();

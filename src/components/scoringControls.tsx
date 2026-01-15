@@ -13,6 +13,17 @@ async function inc(matchId: string, field: IncField, delta: number) {
   await updateDoc(ref, { [field]: increment(delta) } as any);
 }
 
+async function finishMatch(matchId: string, winner: "A" | "B", method: "points" | "submission" | "ref_decision") {
+  const ref = doc(db, "matches", matchId);
+  const winnerId = winner === "A" ? "fighterA" : "fighterB";
+
+  await updateDoc(ref, {
+    Status: "finished",
+    WinnerId: winnerId,
+    WinMethod: method
+  });
+}
+
 export function ScoringControls({ matchId }: Props) {
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -58,6 +69,48 @@ export function ScoringControls({ matchId }: Props) {
           <button onClick={() => inc(matchId, "PenaltiesB", 1)}>B +1 Pen</button>
           <button onClick={() => inc(matchId, "PenaltiesA", -1)}>A Undo</button>
           <button onClick={() => inc(matchId, "PenaltiesB", -1)}>B Undo</button>
+        </div>
+      </section>
+
+      <section style={{ display: "grid", gap: 8 }}>
+        <h3 style={{ margin: 0 }}>Finish Match</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <button
+            style={{ background: "#28a745", color: "white" }}
+            onClick={() => finishMatch(matchId, "A", "points")}
+          >
+            A Wins (Points)
+          </button>
+          <button
+            style={{ background: "#28a745", color: "white" }}
+            onClick={() => finishMatch(matchId, "B", "points")}
+          >
+            B Wins (Points)
+          </button>
+          <button
+            style={{ background: "#dc3545", color: "white" }}
+            onClick={() => finishMatch(matchId, "A", "submission")}
+          >
+            A Wins (Sub)
+          </button>
+          <button
+            style={{ background: "#dc3545", color: "white" }}
+            onClick={() => finishMatch(matchId, "B", "submission")}
+          >
+            B Wins (Sub)
+          </button>
+          <button
+            style={{ background: "#6c757d", color: "white" }}
+            onClick={() => finishMatch(matchId, "A", "ref_decision")}
+          >
+            A Wins (Ref)
+          </button>
+          <button
+            style={{ background: "#6c757d", color: "white" }}
+            onClick={() => finishMatch(matchId, "B", "ref_decision")}
+          >
+            B Wins (Ref)
+          </button>
         </div>
       </section>
     </div>

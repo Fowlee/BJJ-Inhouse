@@ -1,25 +1,25 @@
 export type MatchStatus = "scheduled" | "in_progress" | "finished";
 
 export type MatchDoc = {
-  matId: string;
-  status: MatchStatus;
+  MatId: string;
+  Status: MatchStatus;
 
-  fighterAName: string;
-  fighterBName: string;
+  FighterAName: string;
+  FighterBName: string;
 
-  pointsA: number;
-  pointsB: number;
-  advantagesA: number;
-  advantagesB: number;
-  penaltiesA: number;
-  penaltiesB: number;
+  PointsA: number;
+  PointsB: number;
+  AdvantagesA: number;
+  AdvantagesB: number;
+  PenaltiesA: number;
+  PenaltiesB: number;
 
-  round: number;
-  positionInRound: number;
+  Round: number;
+  PositionInRound: number;
 
   // optional (later)
-  winnerId?: string;
-  winMethod?: "points" | "submission" | "ref_decision";
+  WinnerId?: string;
+  WinMethod?: "points" | "submission" | "ref_decision";
 };
 
 export type MatchWithId = MatchDoc & { id: string };
