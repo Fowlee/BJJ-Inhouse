@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import LoginPage from "./pages/loginPage";
+import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import MatScoringPage from "./pages/MatScoringPage";
 
