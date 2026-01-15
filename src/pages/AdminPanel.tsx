@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../assets/firebase";
 import type { MatchWithId, MatchStatus } from "../types";
 
@@ -18,12 +18,20 @@ export default function AdminPanel() {
   });
 
   useEffect(() => {
-    const q = query(collection(db, "matches"), orderBy("Round"), orderBy("PositionInRound"));
+    const q = query(collection(db, "matches"));
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({
         id: d.id,
         ...d.data(),
       } as MatchWithId));
+
+      // Sort in memory to avoid needing Firestore composite index
+      data.sort((a, b) => {
+        const roundDiff = a.Round - b.Round;
+        if (roundDiff !== 0) return roundDiff;
+        return a.PositionInRound - b.PositionInRound;
+      });
+
       setMatches(data);
       setLoading(false);
     });
