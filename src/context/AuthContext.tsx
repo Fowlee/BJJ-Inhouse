@@ -42,18 +42,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // get role from Firestore: users/{uid}
-      const userRef = doc(collection(db, "users"), fbUser.uid);
-      const snap = await getDoc(userRef);
+      try {
+        // get role from Firestore: users/{uid} with timeout
+        const userRef = doc(collection(db, "users"), fbUser.uid);
 
-      const role = (snap.exists() ? snap.data().role : "judge") as Role;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("Firestore timeout")), 5000);
+        });
 
-      setUser({
-        uid: fbUser.uid,
-        displayName: fbUser.displayName,
-        role,
-      });
-      setLoading(false);
+        const snap = await Promise.race([getDoc(userRef), timeoutPromise]);
+
+        const role = (snap.exists() ? snap.data().role : "judge") as Role;
+
+        setUser({
+          uid: fbUser.uid,
+          displayName: fbUser.displayName,
+          role,
+        });
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        // Default to judge role if there's an error or timeout
+        setUser({
+          uid: fbUser.uid,
+          displayName: fbUser.displayName,
+          role: "judge",
+        });
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsub();
